@@ -74,6 +74,7 @@ headers['api-version']= '2'
 headers['User-Agent']='My-Litle-Python-Script'
 
 # We get status codes when it fails - Let's explain
+# API tells us this
 def show_status_code(code):
   code = str(code)
   if code == '400':
@@ -88,6 +89,7 @@ def show_status_code(code):
       engrish = 'We don\t know.  Check the response codes for HIBP @ https://haveibeenpwned.com/API/v2#ResponseCodes for '+code
   print(engrish)
 
+# Check Breach
 def check_breach(eml):
     print('Breach Check for: %s'%eml)
     url = 'https://haveibeenpwned.com/api/breachedaccount/'+eml
@@ -103,6 +105,7 @@ def check_breach(eml):
     else:
         show_status_code(r.status_code)
 
+# Check Paste
 def check_paste(eml):
     print('Paste Check for: %s'%eml)
     url = 'https://haveibeenpwned.com/api/pasteaccount/'+eml
@@ -113,18 +116,20 @@ def check_paste(eml):
             source = d['Source']
             id = str(d['Id'])
             pasteDate = d['Date']
-            print('Paste Source: %s\nID: %s <-- use with source to find\nDate: %s\n\n'%(source,id,pasteDate))
+            print('Paste Source: %s\nID: %s\nDate: %s\n\n'%(source,id,pasteDate))
     else:
         show_status_code(r.status_code)
 
 # Get started
 show_banner()
 
+# Single Checks
 if chkType == 'email':
     if hibpCheck == 'breachaccount':
         check_breach(chkIt)
     else:
         check_paste(chkIt)
+# File Checks
 elif chkType == 'file':
     get_emails = open(chkIt, 'r')
     for line in get_emails:
@@ -135,5 +140,6 @@ elif chkType == 'file':
         else:
             check_paste(cleanEmail)
             time.sleep(2)
+# Something really interesting happened
 else:
     print('We in trouble.  We should not be here.')
