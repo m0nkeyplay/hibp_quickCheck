@@ -131,15 +131,19 @@ if chkType == 'email':
         check_paste(chkIt)
 # File Checks
 elif chkType == 'file':
-    get_emails = open(chkIt, 'r')
-    for line in get_emails:
-        cleanEmail = line.strip()
-        if hibpCheck == 'breachaccount':
-            check_breach(cleanEmail)
-            time.sleep(2)
-        else:
-            check_paste(cleanEmail)
-            time.sleep(2)
+    if not os.path.isfile(chkIt):
+        print('\n\nWe can\'t find/open %s.  Please check that it\'s a valid file.\n\n'%chkIt)
+    else:
+        get_emails = open(chkIt, 'r')
+        for line in get_emails:
+            cleanEmail = line.strip()
+            if hibpCheck == 'breachaccount':
+                check_breach(cleanEmail)
+                time.sleep(2)
+            else:
+                check_paste(cleanEmail)
+                time.sleep(2)
+        get_emails.close()
 # Something really interesting happened
 else:
     print('We in trouble.  We should not be here.')
