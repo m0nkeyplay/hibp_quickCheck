@@ -30,22 +30,29 @@ def show_banner():
 
 # Short Help Menu
 def show_help():
-    print('\n\nHelp with argument usage\n')
+    print('\n::Help with argument usage::\n')
     print('Which check do you want to do?  breach or paste')
     print('Are you searching one or many emails?')
     print('-e  or -f with textFile having one email per line')
-    print('Example:\nBreach+Email: hibp_check_.py -breach -e my@email.com')
-    print('Example:\nBreach+List of emails: hibp_check_.py -breach -f ./path/to/file')
+    print('$: Breach+Email: hibp_check_.py -breach -e my@email.com')
+    print('$: Breach+List of emails: hibp_check_.py -breach -f ./path/to/file')
 
 # Arg Check
 # Sanity Needs to be added
 if len(argv) < 3:
     show_banner()
+    try:
+        argv[1]
+    except IndexError:
+        print('We need a few variables to make this work.')
+        show_help()
+        exit()
     if argv[1] == '-h':
         show_help()
         exit()
     else:
-        print('Something is missing\nWe need 3 variables to do this.\nCheck usage details above.')
+        print('???? Something is missing ?????\nWe need 3 variables to do this.')
+        show_help()
         exit()
 else:
     chk=argv[1]
