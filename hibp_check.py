@@ -34,8 +34,8 @@ def show_help():
     print('Which check do you want to do?  breach or paste')
     print('Are you searching one or many emails?')
     print('-e  or -f with textFile having one email per line')
-    print('$: Breach+Email: hibp_check_.py -breach -e my@email.com')
-    print('$: Breach+List of emails: hibp_check_.py -breach -f ./path/to/file')
+    print('$: Breach+Email: hibp_check_.py breach -e my@email.com')
+    print('$: Breach+List of emails: hibp_check_.py breach -f ./path/to/file')
 
 # Arg Check
 # Sanity Needs to be added
@@ -44,14 +44,9 @@ if len(argv) < 3:
     try:
         argv[1]
     except IndexError:
-        print('We need a few variables to make this work.')
-        show_help()
-        exit()
-    if argv[1] == '-h':
-        show_help()
+        print('hibb_check.py -h for help')
         exit()
     else:
-        print('???? Something is missing ?????\nWe need 3 variables to do this.')
         show_help()
         exit()
 else:
