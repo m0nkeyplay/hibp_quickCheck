@@ -1,10 +1,14 @@
-#!/usr/bin/python3
+#!/usr/bin/env python3
 #
-#  author:		https://github.com/m0nkeyplay
-#  March 14, 2019 - original script written
-#  Free to use
-#  Free to modify and make better
-#  ./hibp_check.py -h for help
+#   author:		https://github.com/m0nkeyplay
+#   August 26, 2019 - original script written
+#   Free to use
+#   Free to modify and make better
+#   ./hibp_check.py -h for help
+#   Use of the have i been pwned API now requires a m0nkeyplay
+#   I am not requiring a key, but the script won't run without it.
+#   Get a key here:
+#   Paste it in below headers['hibp-api-key']=''
 
 import requests
 import json
@@ -12,6 +16,14 @@ import os
 import time
 import datetime
 from sys import argv
+import signal
+
+#   CTRL+C handler - from https:/gist.github.com/mikerr/6389549
+def handler(signum, frame):
+    print("\n^^^^^^Task aborted by user.  Some cleanup may be necessary.")
+    exit(0)
+
+signal.signal(signal.SIGINT,handler)
 
 #  Banner Info
 def show_banner():
@@ -21,8 +33,8 @@ def show_banner():
   print('###  Usage: hibp_check.py breach|paste -e email|-f textFile  ###')
   print('###                                                          ###')
   print('###  Use and modify at will.                                 ###')
-  print('###  Using the HIBP API v2                                   ###')
-  print('###  https://haveibeenpwned.com/API/v2                       ###')
+  print('###  Using the HIBP API v3                                   ###')
+  print('###  https://haveibeenpwned.com/API/v3                       ###')
   print('###                                                          ###')
   print('###  *Note that using a file will take some time since the   ###')
   print('###  API we are calling is rate limited.                     ###')
@@ -44,7 +56,7 @@ if len(argv) < 3:
     try:
         argv[1]
     except IndexError:
-        print('hibb_check.py -h for help')
+        print('hibp_check.py -h for help')
         exit()
     else:
         show_help()
@@ -72,29 +84,32 @@ else:
 # Hopefully got through the arg checks, let's build this check
 headers = {}
 headers['content-type']= 'application/json'
-headers['api-version']= '2'
-headers['User-Agent']='My-Litle-Python-Script'
+headers['api-version']= '3'
+headers['User-Agent']='the-monkey-playground-script'
+headers['hibp-api-key']=''
 
 # We get status codes when it fails - Let's explain
 # API tells us this
 def show_status_code(code):
-  code = str(code)
-  if code == '400':
-      engrish = 'Bad request — the account does not comply with an acceptable format (i.e. it\'s an empty string)'
-  elif code == '403':
-      engrish = 'Forbidden — no user agent has been specified in the request'
-  elif code == '404':
-      engrish = 'Not found — the account could not be found and has therefore not been pwned'
-  elif code == '429':
-      engrish = 'Too Tany requests — the rate limit has been exceeded'
-  else:
-      engrish = 'We don\t know.  Check the response codes for HIBP @ https://haveibeenpwned.com/API/v2#ResponseCodes for '+code
-  print(engrish)
+    code = str(code)
+    if code == '400':
+        inglish = 'Bad request — the account does not comply with an acceptable format (i.e. it\'s an empty string)'
+    elif code == '400':
+        inglish = 'Unauthorised — the API key provided was not valid'
+    elif code == '403':
+        inglish = 'Forbidden — no user agent has been specified in the request'
+    elif code == '404':
+        inglish = 'Not found — the account could not be found and has therefore not been pwned'
+    elif code == '429':
+        inglish = 'Too Many requests — the rate limit has been exceeded'
+    else:
+        inglish = 'We don\t know.  Check the response codes for HIBP @ https://haveibeenpwned.com/API/v3#ResponseCodes for '+code
+    print(inglish)
 
 # Check Breach
 def check_breach(eml):
     print('Breach Check for: %s'%eml)
-    url = 'https://haveibeenpwned.com/api/breachedaccount/'+eml
+    url = 'https://haveibeenpwned.com/api/v3/breachedaccount/'+eml+'?truncateResponse=false'
     r = requests.get(url, headers=headers)
     if r.status_code == 200:
         data = r.json()
@@ -110,7 +125,7 @@ def check_breach(eml):
 # Check Paste
 def check_paste(eml):
     print('Paste Check for: %s'%eml)
-    url = 'https://haveibeenpwned.com/api/pasteaccount/'+eml
+    url = 'https://haveibeenpwned.com/api/v3/pasteaccount/'+eml
     r = requests.get(url, headers=headers)
     if r.status_code == 200:
         data = r.json()
@@ -124,7 +139,6 @@ def check_paste(eml):
 
 # Get started
 show_banner()
-
 # Single Checks
 if chkType == 'email':
     if hibpCheck == 'breachaccount':
