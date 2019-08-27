@@ -88,31 +88,13 @@ headers['api-version']= '3'
 headers['User-Agent']='the-monkey-playground-script'
 headers['hibp-api-key']=''
 
-# We get status codes when it fails - Let's explain
-# API tells us this
-def show_status_code(code):
-    code = str(code)
-    if code == '400':
-        inglish = 'Bad request — the account does not comply with an acceptable format (i.e. it\'s an empty string)'
-    elif code == '400':
-        inglish = 'Unauthorised — the API key provided was not valid'
-    elif code == '403':
-        inglish = 'Forbidden — no user agent has been specified in the request'
-    elif code == '404':
-        inglish = 'Not found — the account could not be found and has therefore not been pwned'
-    elif code == '429':
-        inglish = 'Too Many requests — the rate limit has been exceeded'
-    else:
-        inglish = 'We don\t know.  Check the response codes for HIBP @ https://haveibeenpwned.com/API/v3#ResponseCodes for '+code
-    print(inglish)
-
 # Check Breach
 def check_breach(eml):
     print('Breach Check for: %s'%eml)
     url = 'https://haveibeenpwned.com/api/v3/breachedaccount/'+eml+'?truncateResponse=false'
     r = requests.get(url, headers=headers)
+    data = r.json()
     if r.status_code == 200:
-        data = r.json()
         for d in data:
             breach = d['Name']
             title = d['Title']
@@ -120,22 +102,24 @@ def check_breach(eml):
             breachDate = d['BreachDate']
             print('Breach: %s\nTitle: %s\nDomain: %s\nBreach Date:%s\n\n'%(breach,title,domain,breachDate))
     else:
-        show_status_code(r.status_code)
+        print('Error: '+str(r.status_code)+' %s'%(data["message"]))
+        exit()
 
 # Check Paste
 def check_paste(eml):
     print('Paste Check for: %s'%eml)
     url = 'https://haveibeenpwned.com/api/v3/pasteaccount/'+eml
     r = requests.get(url, headers=headers)
+    data = r.json()
     if r.status_code == 200:
-        data = r.json()
         for d in data:
             source = d['Source']
             id = str(d['Id'])
             pasteDate = d['Date']
             print('Paste Source: %s\nID: %s\nDate: %s\n\n'%(source,id,pasteDate))
     else:
-        show_status_code(r.status_code)
+        print('Error: '+str(r.status_code)+' %s'%(data["message"]))
+        exit()
 
 # Get started
 show_banner()
