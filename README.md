@@ -11,3 +11,5 @@ Now requires an API key from ';--have i been pwned?
 Keys and the reason why can be obtained here: https://haveibeenpwned.com/API/Key
 
 Comments and cleanup always welcome!
+
+[![asciicast](https://asciinema.org/a/264376.svg)](https://asciinema.org/a/264376)
