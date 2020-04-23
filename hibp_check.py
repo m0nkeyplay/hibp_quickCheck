@@ -102,8 +102,11 @@ def check_breach(eml):
             breachDate = d['BreachDate']
             sensitive = d['IsSensitive']
             print('Account: %s\nBreach: %s\nSensitive: %s\nDomain: %s\nBreach Date:%s\n'%(eml,breach,sensitive,domain,breachDate))
+    elif r.status_code == 401:
+        print("Looks like you forgot an API key")
+        exit()
     else:
-        print('Error: '+str(r.status_code)+' %s'%(data["message"]))
+        print('Error: '+str(r.status_code))
         exit()
 
 # Check Paste
@@ -121,7 +124,9 @@ def check_paste(eml):
             id = str(d['Id'])
             pasteDate = d['Date']
             print('Paste Source: %s\nID: %s\nDate: %s\n\n'%(source,id,pasteDate))
-        #print(r.status_code)
+    elif r.status_code == 401:
+        print("Looks like you forgot an API key")
+        exit()
     else:
         print('Error: '+str(r.status_code))
         exit()
