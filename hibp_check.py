@@ -84,57 +84,62 @@ headers['content-type']= 'application/json'
 headers['api-version']= '3'
 headers['User-Agent']='the-monkey-playground-script'
 #   Place that API key here
-#   https://haveibeenpwned.com/API/Key
-headers['hibp-api-key']=''
+headers['hibp-api-key']='https://haveibeenpwned.com/API/Key'
 
 # Check Breach
 def check_breach(eml):
-    print('Breach Check for: %s'%eml)
     url = 'https://haveibeenpwned.com/api/v3/breachedaccount/'+eml+'?truncateResponse=false'
     r = requests.get(url, headers=headers)
     if r.status_code == 404:
-        print("%s not found. This can be good, or an incorrect email." %eml)
+        print("%s not found in a breach."%eml)
     elif r.status_code == 200:
         data = r.json()
+        print('Breach Check for: %s'%eml)
         for d in data:
+            #   Simple info
             breach = d['Name']
             domain = d['Domain']
             breachDate = d['BreachDate']
             sensitive = d['IsSensitive']
             print('Account: %s\nBreach: %s\nSensitive: %s\nDomain: %s\nBreach Date:%s\n'%(eml,breach,sensitive,domain,breachDate))
-    elif r.status_code == 401:
-        print("Looks like you forgot an API key")
-        exit()
+            #   or to print out the whole shebang comment above and uncomment below
+            #for k,v in d.items():
+            #    print(k+":"+str(v))
     else:
-        print('Error: '+str(r.status_code))
+        data = r.json()
+        print('Error: <%s>  %s'%(str(r.status_code),data['message']))
         exit()
 
 # Check Paste
 def check_paste(eml):
-    print('Paste Check for: %s'%eml)
     url = 'https://haveibeenpwned.com/api/v3/pasteaccount/'+eml
     print(url)
     r = requests.get(url, headers=headers)
     if r.status_code == 404:
-        print("%s not found. This is a good sign, no pastes at the moment." %eml)
+        print("%s not found in a breach."%eml)
     elif r.status_code == 200:
         data = r.json()
+        print('Paste Check for: %s'%eml)
         for d in data:
             source = d['Source']
             id = str(d['Id'])
             pasteDate = d['Date']
+            #   Uncomment and add these if you like
+            #title = str(d['Title'])
+            #EmailCount = str(d['EmailCount'])
             print('Paste Source: %s\nID: %s\nDate: %s\n\n'%(source,id,pasteDate))
-    elif r.status_code == 401:
-        print("Looks like you forgot an API key")
-        exit()
     else:
-        print('Error: '+str(r.status_code))
+        data = r.json()
+        print('Error: <%s>  %s'%(str(r.status_code),data['message']))
         exit()
 
 # Get started
 if __name__ == '__main__':
     show_banner()
     # Single Checks
+    if headers['hibp-api-key']=='https://haveibeenpwned.com/API/Key':
+        print("ERROR: Setup still required.\nPlease register an API key to start using this script.\nRegister @ %s"%headers['hibp-api-key'])
+        exit()
     if chkType == 'email':
         if hibpCheck == 'breachaccount':
             check_breach(chkIt)
