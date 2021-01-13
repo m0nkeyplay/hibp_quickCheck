@@ -3,12 +3,14 @@
 #   author:		https://github.com/m0nkeyplay
 #   August 26, 2019 - original script written
 #   Updated April 23, 2020 - see README for updates
+#   Updated January 12, 2020 - because I saw typos and managed to change the way text is printee
 #   Free to use
 #   Free to modify and make better
 #   ./hibp_check.py -h for help
-#   Use of the have i been pwned API now requires a m0nkeyplay
+#   Use of the have i been pwned API now requires a key that must be paid for
 #   I am not requiring a key, but the script won't run without it.
-#   Get a key here:
+#   Get a key here and learn about why it's required here:
+#   https://haveibeenpwned.com/API/Key
 #   Paste it in below headers['hibp-api-key']=''
 
 import requests
@@ -57,6 +59,35 @@ def show_help():
     print('$: Breach+Email: hibp_check_.py -b -e my@email.com')
     print('$: Breach+List of emails: hibp_check_.py -b -f ./path/to/file')
 
+#   Text we are going to use
+headerError = """
+ERROR: Setup still required.
+Please register an API key to start using this script.
+Register @ %s
+"""
+
+fileError = """
+We can't find/open %s.  
+Please check that it's a valid file.
+"""
+
+dataError = "Error: <%s>  %s"
+
+breachData = """
+Account: %s
+Breach: %s
+Sensitive: %s
+Domain: %sBreach Date:%s
+
+"""
+
+pasteData = """
+Paste Source: %s
+ID: %s
+Date: %s
+
+"""
+
 
 if args['breach']:
     hibpCheck = 'breachaccount'
@@ -101,13 +132,13 @@ def check_breach(eml):
             domain = d['Domain']
             breachDate = d['BreachDate']
             sensitive = d['IsSensitive']
-            print('Account: %s\nBreach: %s\nSensitive: %s\nDomain: %s\nBreach Date:%s\n'%(eml,breach,sensitive,domain,breachDate))
+            print(breachData%(eml,breach,sensitive,domain,breachDate))
             #   or to print out the whole shebang comment above and uncomment below
             #for k,v in d.items():
             #    print(k+":"+str(v))
     else:
         data = r.json()
-        print('Error: <%s>  %s'%(str(r.status_code),data['message']))
+        print(dataError%(str(r.status_code),data['message']))
         exit()
 
 # Check Paste
@@ -127,10 +158,10 @@ def check_paste(eml):
             #   Uncomment and add these if you like
             #title = str(d['Title'])
             #EmailCount = str(d['EmailCount'])
-            print('Paste Source: %s\nID: %s\nDate: %s\n\n'%(source,id,pasteDate))
+            print(pasteData%(source,id,pasteDate))
     else:
         data = r.json()
-        print('Error: <%s>  %s'%(str(r.status_code),data['message']))
+        print(dataError%(str(r.status_code),data['message']))
         exit()
 
 # Get started
@@ -138,7 +169,7 @@ if __name__ == '__main__':
     show_banner()
     # Single Checks
     if headers['hibp-api-key']=='https://haveibeenpwned.com/API/Key':
-        print("ERROR: Setup still required.\nPlease register an API key to start using this script.\nRegister @ %s"%headers['hibp-api-key'])
+        print(headerError%headers['hibp-api-key'])
         exit()
     if chkType == 'email':
         if hibpCheck == 'breachaccount':
@@ -148,7 +179,7 @@ if __name__ == '__main__':
     # File Checks
     elif chkType == 'file':
         if not os.path.isfile(chkIt):
-            print('\n\nWe can\'t find/open %s.  Please check that it\'s a valid file.\n\n'%chkIt)
+            print(fileError%chkIt)
         else:
             get_emails = open(chkIt, 'r')
             for line in get_emails:
